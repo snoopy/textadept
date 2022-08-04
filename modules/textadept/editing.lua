@@ -364,8 +364,8 @@ function M.toggle_comment()
   end
   prefix = prefix .. ' '
 
-  local line_length = buffer:line_length(buffer.line_from_position(buffer.current_pos))
-  if buffer.selection_empty and line_length <= 1 then
+  local current_line = buffer:get_line(buffer.line_from_position(buffer.current_pos))
+  if buffer.selection_empty and current_line:match('^%s*$') then
     buffer:insert_text(buffer.current_pos, prefix)
     buffer:goto_pos(buffer.current_pos + #prefix)
     return
@@ -379,11 +379,11 @@ function M.toggle_comment()
 
   buffer:begin_undo_action()
   for line = s, not ignore_last_line and e or e - 1 do
-    if buffer:line_length(line) <= 1 then goto continue end
+    local full_line = buffer:get_line(line)
+    if full_line:match('^%s*$') then goto continue end
 
     local p = buffer.line_indent_position[line]
 
-    local full_line = buffer:get_line(line)
     local uncomment = full_line:match('^%s*(' .. prefix_esc .. '%s?)')
     if uncomment then uncomment = uncomment:gsub('\n*$', '') end
 
