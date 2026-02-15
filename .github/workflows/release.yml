@@ -113,7 +113,7 @@ jobs:
             if: ${{ inputs.linux || github.event_name == 'schedule' }}
           - os: windows-2022
             if: ${{ inputs.windows || github.event_name == 'schedule' }}
-            qt: '6.10'
+            qt: '6.9'
           - os: macOS-15
             if: ${{ inputs.macOS || github.event_name == 'schedule' }}
             qt: '6.11'
