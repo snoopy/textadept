@@ -358,7 +358,22 @@ void set_menubar(lua_State *L, int index) {
 	ta->menuBar()->setVisible(lua_rawlen(L, index) > 0);
 }
 
+// std::string get_clipboard_text() {
+// const auto utf8{QGuiApplication::clipboard()->text().toUtf8()};
+// return std::string{utf8.constData(), utf8.size()};
+// }
+
 char *get_clipboard_text(int *len) {
+	const auto utf8{QGuiApplication::clipboard()->text().toUtf8()};
+	*len = utf8.size();
+	auto *buffer{static_cast<char *>(malloc(*len + 1))};
+	if (not buffer) { return nullptr; }
+	memcpy(buffer, utf8.constData(), *len);
+	buffer[*len] = '\0';
+	return buffer;
+}
+
+char *get_clipboard_text2(int *len) {
 	const QString &text = QGuiApplication::clipboard()->text();
 	*len = text.size();
 	return static_cast<char *>(memcpy(malloc(*len), text.toStdString().c_str(), *len));
