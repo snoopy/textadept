@@ -1062,8 +1062,12 @@ static int delete_buffer_lua(lua_State *L) {
 	// if #_BUFFERS == 1 then buffer.new() end
 	if (lua_getfield(L, LUA_REGISTRYINDEX, BUFFERS), lua_rawlen(L, -1) == 1) new_buffer(0);
 	if (view == focused_view) goto_doc(L, focused_view, -1, true);
+	sptr_t doc_after_goto = view == focused_view ? get_doc(focused_view) : 0;
 	delete_buffer(doc);
-	if (view == focused_view) emit("buffer_after_switch", -1);
+	// Only emit buffer_after_switch if the BUFFER_DELETED handler did not already switch buffers
+	// (which would have emitted buffer_after_switch via goto_doc_lua).
+	if (view == focused_view && get_doc(focused_view) == doc_after_goto)
+		emit("buffer_after_switch", -1);
 	return 0;
 }
 

@@ -288,8 +288,9 @@ events.connect(events.BUFFER_BEFORE_REPLACE_TEXT, save_buffer_state)
 --- Restore buffer properties.
 local function restore_buffer_state()
 	if not buffer._folds then return end
-	-- Restore fold state.
-	for _, line in ipairs(buffer._folds) do view:toggle_fold(line) end
+	-- Restore fold state.  Use FOLDACTION_CONTRACT (idempotent) rather than toggle_fold so that
+	-- calling this function more than once does not re-expand already-collapsed folds.
+	for _, line in ipairs(buffer._folds) do view:fold_line(line, view.FOLDACTION_CONTRACT) end
 	-- Restore view state.
 	if buffer.length > 1 then buffer.selection_serialized = buffer._selection end
 	buffer:choose_caret_x()
